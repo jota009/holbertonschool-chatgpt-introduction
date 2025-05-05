@@ -46,9 +46,9 @@ class Minesweeper:
 
     def reveal(self, x, y):
         if self.revealed[y][x]:
-            return True  # Already revealed, skip
+            return True  # Already revealed
         if (x, y) in self.mines:
-            return False
+            return False  # Hit a mine
         self.revealed[y][x] = True
         if self.count_mines_nearby(x, y) == 0:
             for dx in [-1, 0, 1]:
@@ -56,6 +56,13 @@ class Minesweeper:
                     nx, ny = x + dx, y + dy
                     if 0 <= nx < self.width and 0 <= ny < self.height:
                         self.reveal(nx, ny)
+        return True
+
+    def is_game_won(self):
+        for y in range(self.height):
+            for x in range(self.width):
+                if not self.revealed[y][x] and (x, y) not in self.mines:
+                    return False
         return True
 
     def play(self):
@@ -71,12 +78,9 @@ class Minesweeper:
                     self.print_board(reveal=True)
                     print("Game Over! You hit a mine.")
                     break
-                # Check if all safe cells are revealed
-                if all(self.revealed[y][x] or (x, y) in self.mines
-                       for y in range(self.height)
-                       for x in range(self.width)):
+                if self.is_game_won():
                     self.print_board(reveal=True)
-                    print("Congratulations! You've cleared the minefield.")
+                    print("Congratulations! You’ve cleared the minefield!")
                     break
             except ValueError:
                 print("Invalid input. Please enter numbers only.")
